@@ -112,7 +112,12 @@ class Camera:
         init_config.postProcessing.thresholdFilter.maxRange = config.max_range
         init_config.postProcessing.decimationFilter.decimationFactor = 1
         cam_stereo.initialConfig.set(init_config)
-
+        manip = pipeline.createImageManip()
+        #manip.initialConfig.setResize(600, 450)
+        manip.initialConfig.setResize(600, 400)
+        
+        #camRgb.setIspScale(1,3)
+        #cam_stereo.isp.link(manip.inputImage)
         xout_depth = pipeline.createXLinkOut()
         xout_depth.setStreamName("depth")
         cam_stereo.depth.link(xout_depth.input)
@@ -125,8 +130,10 @@ class Camera:
             cam_rgb = pipeline.createColorCamera()
             cam_rgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
             cam_rgb.setColorOrder(dai.ColorCameraProperties.ColorOrder.RGB)
-            cam_rgb.setIspScale(1, 3)
+            #cam_rgb.setIspScale(1, 3)
             cam_rgb.initialControl.setManualFocus(130)
+
+            cam_rgb.isp.link(manip.inputImage)
             cam_stereo.setDepthAlign(dai.CameraBoardSocket.RGB)
             cam_rgb.isp.link(xout_image.input)
             self.image_size = cam_rgb.getIspSize()
